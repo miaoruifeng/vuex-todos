@@ -1,14 +1,14 @@
 <template>
   <div id="app">
-    <a-input placeholder="请输入任务" class="my_ipt" />
-    <a-button type="primary">添加事项</a-button>
+    <a-input placeholder="请输入任务" class="my_ipt" :value="inputValue" @change="handleInputChange" />
+    <a-button type="primary" @click="addItem">添加事项</a-button>
 
     <a-list bordered :dataSource="list" class="dt_list">
       <a-list-item slot="renderItem" slot-scope="item">
         <!-- 复选框 -->
         <a-checkbox>{{item.info}}</a-checkbox>
         <!-- 删除链接 -->
-        <a slot="actions">删除</a>
+        <a slot="actions" @click="removeItemById(item.id)">删除</a>
       </a-list-item>
 
       <!-- footer区域 -->
@@ -29,26 +29,38 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
 export default {
   name: 'app',
   data() {
-    return {
-      list: [
-        {
-          id: 0,
-          info: 'Racing car sprays burning fuel into crowd.',
-          done: false
-        },
-        { id: 1, info: 'Japanese princess to wed commoner.', done: false },
-        {
-          id: 2,
-          info: 'Australian walks 100km after outback crash.',
-          done: false
-        },
-        { id: 3, info: 'Man charged over missing wedding girl.', done: false },
-        { id: 4, info: 'Los Angeles battles huge wildfires.', done: false }
-      ]
+    return {}
+  },
+  computed: {
+    ...mapState(['list', 'inputValue'])
+  },
+  methods: {
+    // ...mapMutations(['setIpuntValue']),
+    // 监听 input 文本内容变化
+    handleInputChange(e) {
+      // console.log(e.target.value)
+      this.$store.commit('setIpuntValue', e.target.value)
+    },
+    // 向列表中新增 item 项
+    addItem() {
+      if (this.inputValue.trim() <= 0) {
+        return this.$message.warning('文本框内容不能为空！')
+      }
+      this.$store.commit('addItem')
+    },
+    // 根据 ID 删除对应的 item 项
+    removeItemById(id) {
+      // console.log(id)
+      this.$store.commit('removeItem', id)
     }
+  },
+  created() {
+    this.$store.dispatch('getList')
   }
 }
 </script>
